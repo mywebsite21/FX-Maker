@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Premium Signal Report</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background: #000;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+        .container {
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+        .report-content {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://i.postimg.cc/tJhNQXVw/1000013379.jpg') center/cover no-repeat;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffd700;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: white;
+            margin-bottom: 15px;
+        }
+        .title[contenteditable="true"]:focus,
+        .subtitle[contenteditable="true"]:focus,
+        td[contenteditable="true"]:focus {
+            outline: 2px solid #ffd700;
+            background: rgba(255, 215, 0, 0.2);
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .report-table th {
+            background: #333;
+            padding: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: white;
+            border-bottom: 2px solid #ffd700;
+        }
+        .report-table td {
+            padding: 8px;
+            border-bottom: 1px solid #444;
+            color: white;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 12px;
+            font-size: 16px;
+            background: #ffd700;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            width: 100%;
+        }
+        button:hover {
+            background: #e6c200;
+            transform: scale(1.05);
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background: #222;
+            color: white;
+        }
+        .error-message {
+            color: #ff5555;
+            font-size: 12px;
+            margin-top: 10px;
+            display: none;
+        }
+        @media (max-width: 400px) {
+            .container {
+                padding: 15px;
+            }
+            .report-content {
+                padding: 15px;
+            }
+            .title {
+                font-size: 20px;
+            }
+            .subtitle {
+                font-size: 14px;
+            }
+            .report-table {
+                font-size: 12px;
+            }
+            .report-table th, .report-table td {
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <textarea id="report-input" placeholder="Paste your reports here (e.g., 23 June 2025 to 27 June,2025 Premium Channel Result\n\nJune 23>>> XAUUSD Sell +120pips(TP2)\n\n04 August,2025 to 08 August,2025 Premium Channel Result\n\n05 August>>> XAUUSD Sell +80pips(TP1))"></textarea>
+        <div class="error-message" id="error-message">Invalid report format. Please ensure each report has a date range (e.g., 'DD Month YYYY to DD Month,YYYY') and rows like 'DD Month>>> Symbol Direction Result' or 'Month DD>>> Symbol Direction Result'.</div>
+        <div id="reports-container"></div>
+        <div class="button-container">
+            <button onclick="toggleEdit()">Toggle Edit Mode</button>
+        </div>
+    </div>
+
+    <script>
+        // Parse reports from textarea and populate multiple tables
+        function parseReports() {
+            const input = document.getElementById('report-input').value.trim();
+            const reportsContainer = document.getElementById('reports-container');
+            const errorMessage = document.getElementById('error-message');
+            reportsContainer.innerHTML = ''; // Clear existing reports
+            errorMessage.style.display = 'none'; // Hide error message by default
+
+            if (!input) {
+                reportsContainer.innerHTML = '<div class="report-content" id="report-content-0"><div class="title">WEEKLY PREMIUM SIGNAL REPORT</div><div class="subtitle" contenteditable="true">Date: Not specified</div><table class="report-table"><thead><tr><th>DATE</th><th>SYMBOL</th><th>DIRECTION</th><th>RESULT</th></tr></thead><tbody id="report-table-body-0"></tbody></table></div>';
+                return;
+            }
+
+            // Split input into lines and filter out empty or ellipsis-only lines
+            const lines = input.split('\n').map(line => line.trim()).filter(line => line && !line.match(/^[\.…]+$/));
+            const dateRangeRegex = /^(\d{1,2}\s+[A-Za-z]+,?\s*\d{4})\s+to\s+(\d{1,2}\s+[A-Za-z]+,?\s*\d{4})/i;
+            const dataRowRegex = /^((\d{1,2}\s+[A-Za-z]+)|([A-Za-z]+\s+\d{1,2}))\s*(>>>|>>|\|)\s*(\w+)\s+(Buy|Sell)\s+([-+]?[0-9]+pips.*)$/i;
+
+            let reports = [];
+            let currentReport = { dateRange: 'Date: Not specified', rows: [] };
+            let hasValidRows = false;
+
+            // Parse lines
+            lines.forEach(line => {
+                // Check for date range
+                const dateRangeMatch = line.match(dateRangeRegex);
+                if (dateRangeMatch) {
+                    // Format the date range to include comma after month
+                    const startDate = dateRangeMatch[1].replace(/(\d{1,2}\s+[A-Za-z]+)(\s*)(\d{4})/, '$1,$3');
+                    const endDate = dateRangeMatch[2].replace(/(\d{1,2}\s+[A-Za-z]+)(\s*)(\d{4})/, '$1,$3');
+                    if (currentReport.rows.length > 0 || currentReport.dateRange !== 'Date: Not specified') {
+                        reports.push(currentReport);
+                        currentReport = { dateRange: `Date: ${startDate} to ${endDate}`, rows: [] };
+                    } else {
+                        currentReport.dateRange = `Date: ${startDate} to ${endDate}`;
+                    }
+                    return;
+                }
+
+                // Check for data row
+                const dataRowMatch = line.match(dataRowRegex);
+                if (dataRowMatch) {
+                    let date = dataRowMatch[1].trim();
+                    // Standardize date format to "DD Month"
+                    if (dataRowMatch[3]) { // If date is in "Month DD" format
+                        const [month, day] = date.split(/\s+/);
+                        date = `${day} ${month}`;
+                    }
+                    const symbol = dataRowMatch[5].trim();
+                    const direction = dataRowMatch[6].trim();
+                    const result = dataRowMatch[7].trim();
+                    currentReport.rows.push({ date, symbol, direction, result });
+                    hasValidRows = true;
+                }
+            });
+
+            // Push the last report
+            if (currentReport.rows.length > 0 || currentReport.dateRange !== 'Date: Not specified') {
+                reports.push(currentReport);
+            }
+
+            // Show error if no valid rows were found but non-date-range lines exist
+            if (!hasValidRows && lines.some(line => !dateRangeRegex.test(line))) {
+                errorMessage.style.display = 'block';
+            }
+
+            // Render reports
+            reports.forEach((report, index) => {
+                const reportDiv = document.createElement('div');
+                reportDiv.className = 'report-content';
+                reportDiv.id = `report-content-${index}`;
+                reportDiv.innerHTML = `
+                    <div class="title">WEEKLY PREMIUM SIGNAL REPORT</div>
+                    <div class="subtitle" contenteditable="true">${report.dateRange}</div>
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>DATE</th>
+                                <th>SYMBOL</th>
+                                <th>DIRECTION</th>
+                                <th>RESULT</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body-${index}"></tbody>
+                    </table>
+                    <button class="download-button" onclick="downloadReport(${index})">Download Report ${index + 1}</button>
+                `;
+                reportsContainer.appendChild(reportDiv);
+
+                // Populate table
+                const tableBody = document.getElementById(`report-table-body-${index}`);
+                report.rows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td contenteditable="true">${row.date}</td>
+                        <td contenteditable="true">${row.symbol}</td>
+                        <td contenteditable="true">${row.direction}</td>
+                        <td contenteditable="true">${row.result}</td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+            });
+        }
+
+        // Event listener for textarea input
+        document.getElementById('report-input').addEventListener('input', parseReports);
+
+        // Toggle edit mode
+        function toggleEdit() {
+            const subtitles = document.querySelectorAll('.subtitle');
+            const cells = document.querySelectorAll('td');
+            const isEditable = subtitles[0]?.getAttribute('contenteditable') === 'true';
+            subtitles.forEach(subtitle => subtitle.setAttribute('contenteditable', !isEditable));
+            cells.forEach(cell => cell.setAttribute('contenteditable', !isEditable));
+            const button = document.querySelector('.button-container button');
+            button.textContent = isEditable ? 'Toggle Edit Mode' : 'Save Changes';
+        }
+
+        // Download report as image
+        function downloadReport(index) {
+            const errorMessage = document.getElementById('error-message');
+            if (errorMessage.style.display === 'block') {
+                alert('Please correct the report format before downloading.');
+                return;
+            }
+            const element = document.getElementById(`report-content-${index}`);
+            // Temporarily hide the download button
+            const downloadButton = element.querySelector('.download-button');
+            downloadButton.style.display = 'none';
+
+            html2canvas(element, {
+                scale: 3,
+                backgroundColor: null,
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                width: element.offsetWidth,
+                height: element.offsetHeight,
+                windowWidth: document.documentElement.offsetWidth,
+                windowHeight: document.documentElement.offsetHeight,
+                onclone: (clonedDoc) => {
+                    const clonedElement = clonedDoc.getElementById(`report-content-${index}`);
+                    clonedElement.style.background = 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(https://i.postimg.cc/tJhNQXVw/1000013379.jpg) center/cover no-repeat';
+                    // Ensure the download button is hidden in the cloned document
+                    const clonedButton = clonedElement.querySelector('.download-button');
+                    if (clonedButton) clonedButton.style.display = 'none';
+                }
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `weekly-premium-signal-report-${index + 1}.png`;
+                link.href = canvas.toDataURL('image/png', 1.0);
+                link.click();
+                // Restore the download button visibility
+                downloadButton.style.display = 'block';
+            }).catch(error => {
+                console.error('Download error:', error);
+                // Restore the download button visibility in case of error
+                downloadButton.style.display = 'block';
+            });
+        }
+
+        // Initialize
+        parseReports();
+    </script>
+</body>
+</html>
