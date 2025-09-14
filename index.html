@@ -18,31 +18,95 @@
             overflow-y: auto;
         }
         .container {
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 400px;
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 380px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            display: none; /* Hidden until code is verified */
+        }
+        .code-prompt {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .code-prompt div {
+            background: #222;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .code-prompt input {
+            padding: 8px;
+            margin: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background: #333;
+            color: white;
+        }
+        .code-prompt button {
+            padding: 8px 16px;
+            font-size: 14px;
+            background: #ffd700;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .code-prompt button:hover {
+            background: #e6c200;
+        }
+        .code-prompt .error {
+            color: #ff5555;
+            font-size: 12px;
+            margin-top: 10px;
+            display: none;
         }
         .report-content {
             background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://i.postimg.cc/tJhNQXVw/1000013379.jpg') center/cover no-repeat;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 15px;
+            border-radius: 8px;
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            background-size: cover;
+        }
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            opacity: 0.5;
+            width: 100%;
+            max-width: 100%;
+            object-fit: contain;
+            cursor: move;
+            user-select: none;
         }
         .title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: #ffd700;
             text-transform: uppercase;
             margin-bottom: 5px;
+            position: relative;
+            z-index: 20;
         }
         .subtitle {
-            font-size: 16px;
+            font-size: 14px;
             color: white;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 20;
         }
         .title[contenteditable="true"]:focus,
         .subtitle[contenteditable="true"]:focus,
@@ -53,31 +117,33 @@
         .report-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
-            margin-bottom: 20px;
+            font-size: 12px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 20;
         }
         .report-table th {
             background: #333;
-            padding: 10px;
+            padding: 8px;
             font-weight: bold;
             text-transform: uppercase;
             color: white;
             border-bottom: 2px solid #ffd700;
         }
         .report-table td {
-            padding: 8px;
+            padding: 6px;
             border-bottom: 1px solid #444;
             color: white;
         }
         .button-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 8px;
+            margin-top: 15px;
         }
         button {
-            padding: 12px;
-            font-size: 16px;
+            padding: 10px;
+            font-size: 14px;
             background: #ffd700;
             color: #000;
             border: none;
@@ -88,14 +154,17 @@
         }
         button:hover {
             background: #e6c200;
-            transform: scale(1.05);
+            transform: scale(1.03);
+        }
+        .download-button {
+            margin-bottom: 10px;
         }
         textarea {
             width: 100%;
-            height: 200px;
-            margin-bottom: 15px;
-            padding: 10px;
-            font-size: 14px;
+            height: 150px;
+            margin-bottom: 10px;
+            padding: 8px;
+            font-size: 12px;
             border-radius: 5px;
             border: 1px solid #444;
             background: #222;
@@ -103,34 +172,95 @@
         }
         .error-message {
             color: #ff5555;
-            font-size: 12px;
-            margin-top: 10px;
+            font-size: 10px;
+            margin-top: 8px;
             display: none;
+        }
+        .image-controls {
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .image-controls label {
+            font-size: 12px;
+            margin-bottom: 3px;
+            color: #ddd;
+        }
+        .image-controls input[type="file"] {
+            grid-column: span 2;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #ddd;
+        }
+        .image-controls input[type="range"] {
+            width: 100%;
+            height: 5px;
+            cursor: pointer;
+        }
+        .image-controls span {
+            font-size: 11px;
+            color: #ffd700;
         }
         @media (max-width: 400px) {
             .container {
-                padding: 15px;
+                padding: 10px;
             }
             .report-content {
-                padding: 15px;
+                padding: 10px;
             }
             .title {
-                font-size: 20px;
+                font-size: 18px;
             }
             .subtitle {
-                font-size: 14px;
-            }
-            .report-table {
                 font-size: 12px;
             }
+            .report-table {
+                font-size: 10px;
+            }
             .report-table th, .report-table td {
-                padding: 6px;
+                padding: 5px;
+            }
+            .image-controls {
+                grid-template-columns: 1fr;
+                gap: 5px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="code-prompt" id="code-prompt">
+        <div>
+            <h3>Enter Access Code</h3>
+            <input type="text" id="access-code" placeholder="Enter code">
+            <button onclick="verifyCode()">Submit</button>
+            <div class="error" id="code-error">Incorrect code. Please try again.</div>
+        </div>
+    </div>
+    <div class="container" id="main-container">
+        <div class="image-controls">
+            <label for="image-upload">Upload Watermark:</label>
+            <input type="file" id="image-upload" accept="image/*">
+            <div>
+                <label for="image-size">Size: <span id="size-value">100%</span></label>
+                <input type="range" id="image-size" min="20" max="150" value="100">
+            </div>
+            <div>
+                <label for="image-opacity">Opacity: <span id="opacity-value">0.5</span></label>
+                <input type="range" id="image-opacity" min="0" max="1" step="0.01" value="0.5">
+            </div>
+            <div>
+                <label for="image-x-position">X-Pos: <span id="x-position-value">50%</span></label>
+                <input type="range" id="image-x-position" min="0" max="100" value="50">
+            </div>
+            <div>
+                <label for="image-y-position">Y-Pos: <span id="y-position-value">50%</span></label>
+                <input type="range" id="image-y-position" min="0" max="100" value="50">
+            </div>
+        </div>
         <textarea id="report-input" placeholder="Paste your reports here (e.g., 23 June 2025 to 27 June,2025 Premium Channel Result\n\nJune 23>>> XAUUSD Sell +120pips(TP2)\n\n04 August,2025 to 08 August,2025 Premium Channel Result\n\n05 August>>> XAUUSD Sell +80pips(TP1))"></textarea>
         <div class="error-message" id="error-message">Invalid report format. Please ensure each report has a date range (e.g., 'DD Month YYYY to DD Month,YYYY') and rows like 'DD Month>>> Symbol Direction Result' or 'Month DD>>> Symbol Direction Result'.</div>
         <div id="reports-container"></div>
@@ -140,6 +270,18 @@
     </div>
 
     <script>
+        // Code verification
+        function verifyCode() {
+            const code = document.getElementById('access-code').value.trim();
+            const codeError = document.getElementById('code-error');
+            if (code === '8757') {
+                document.getElementById('code-prompt').style.display = 'none';
+                document.getElementById('main-container').style.display = 'block';
+            } else {
+                codeError.style.display = 'block';
+            }
+        }
+
         // Parse reports from textarea and populate multiple tables
         function parseReports() {
             const input = document.getElementById('report-input').value.trim();
@@ -149,11 +291,29 @@
             errorMessage.style.display = 'none'; // Hide error message by default
 
             if (!input) {
-                reportsContainer.innerHTML = '<div class="report-content" id="report-content-0"><div class="title">WEEKLY PREMIUM SIGNAL REPORT</div><div class="subtitle" contenteditable="true">Date: Not specified</div><table class="report-table"><thead><tr><th>DATE</th><th>SYMBOL</th><th>DIRECTION</th><th>RESULT</th></tr></thead><tbody id="report-table-body-0"></tbody></table></div>';
+                reportsContainer.innerHTML = `
+                    <div class="report-content" id="report-content-0">
+                        <button class="download-button" onclick="downloadReport(0)">Download Report 1</button>
+                        <img class="watermark" id="watermark-0" style="display: none;">
+                        <div class="title">WEEKLY PREMIUM SIGNAL REPORT</div>
+                        <div class="subtitle" contenteditable="true">Date: Not specified</div>
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>DATE</th>
+                                    <th>SYMBOL</th>
+                                    <th>DIRECTION</th>
+                                    <th>RESULT</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-table-body-0"></tbody>
+                        </table>
+                    </div>`;
+                updateWatermark(0);
+                addWatermarkInteraction(0);
                 return;
             }
 
-            // Split input into lines and filter out empty or ellipsis-only lines
             const lines = input.split('\n').map(line => line.trim()).filter(line => line && !line.match(/^[\.…]+$/));
             const dateRangeRegex = /^(\d{1,2}\s+[A-Za-z]+,?\s*\d{4})\s+to\s+(\d{1,2}\s+[A-Za-z]+,?\s*\d{4})/i;
             const dataRowRegex = /^((\d{1,2}\s+[A-Za-z]+)|([A-Za-z]+\s+\d{1,2}))\s*(>>>|>>|\|)\s*(\w+)\s+(Buy|Sell)\s+([-+]?[0-9]+pips.*)$/i;
@@ -162,12 +322,9 @@
             let currentReport = { dateRange: 'Date: Not specified', rows: [] };
             let hasValidRows = false;
 
-            // Parse lines
             lines.forEach(line => {
-                // Check for date range
                 const dateRangeMatch = line.match(dateRangeRegex);
                 if (dateRangeMatch) {
-                    // Format the date range to include comma after month
                     const startDate = dateRangeMatch[1].replace(/(\d{1,2}\s+[A-Za-z]+)(\s*)(\d{4})/, '$1,$3');
                     const endDate = dateRangeMatch[2].replace(/(\d{1,2}\s+[A-Za-z]+)(\s*)(\d{4})/, '$1,$3');
                     if (currentReport.rows.length > 0 || currentReport.dateRange !== 'Date: Not specified') {
@@ -179,12 +336,10 @@
                     return;
                 }
 
-                // Check for data row
                 const dataRowMatch = line.match(dataRowRegex);
                 if (dataRowMatch) {
                     let date = dataRowMatch[1].trim();
-                    // Standardize date format to "DD Month"
-                    if (dataRowMatch[3]) { // If date is in "Month DD" format
+                    if (dataRowMatch[3]) {
                         const [month, day] = date.split(/\s+/);
                         date = `${day} ${month}`;
                     }
@@ -196,22 +351,21 @@
                 }
             });
 
-            // Push the last report
             if (currentReport.rows.length > 0 || currentReport.dateRange !== 'Date: Not specified') {
                 reports.push(currentReport);
             }
 
-            // Show error if no valid rows were found but non-date-range lines exist
             if (!hasValidRows && lines.some(line => !dateRangeRegex.test(line))) {
                 errorMessage.style.display = 'block';
             }
 
-            // Render reports
             reports.forEach((report, index) => {
                 const reportDiv = document.createElement('div');
                 reportDiv.className = 'report-content';
                 reportDiv.id = `report-content-${index}`;
                 reportDiv.innerHTML = `
+                    <button class="download-button" onclick="downloadReport(${index})">Download Report ${index + 1}</button>
+                    <img class="watermark" id="watermark-${index}" style="display: none;" crossorigin="anonymous">
                     <div class="title">WEEKLY PREMIUM SIGNAL REPORT</div>
                     <div class="subtitle" contenteditable="true">${report.dateRange}</div>
                     <table class="report-table">
@@ -225,11 +379,9 @@
                         </thead>
                         <tbody id="report-table-body-${index}"></tbody>
                     </table>
-                    <button class="download-button" onclick="downloadReport(${index})">Download Report ${index + 1}</button>
                 `;
                 reportsContainer.appendChild(reportDiv);
 
-                // Populate table
                 const tableBody = document.getElementById(`report-table-body-${index}`);
                 report.rows.forEach(row => {
                     const tr = document.createElement('tr');
@@ -241,13 +393,221 @@
                     `;
                     tableBody.appendChild(tr);
                 });
+
+                updateWatermark(index);
+                addWatermarkInteraction(index);
             });
         }
 
-        // Event listener for textarea input
+        // Watermark handling
+        let currentWatermark = null;
+        let watermarkSize = 100;
+        let watermarkOpacity = 0.5;
+        let watermarkPositions = {};
+
+        function updateWatermark(index) {
+            const watermark = document.getElementById(`watermark-${index}`);
+            if (currentWatermark) {
+                watermark.src = currentWatermark;
+                watermark.crossOrigin = 'anonymous';
+                watermark.style.display = 'block';
+                watermark.style.width = `${watermarkSize}%`;
+                watermark.style.opacity = watermarkOpacity;
+                if (watermarkPositions[index]) {
+                    watermark.style.left = `${watermarkPositions[index].left}%`;
+                    watermark.style.top = `${watermarkPositions[index].top}%`;
+                    watermark.style.transform = `translate(-50%, -50%)`;
+                    document.getElementById('image-x-position').value = watermarkPositions[index].left;
+                    document.getElementById('x-position-value').textContent = `${Math.round(watermarkPositions[index].left)}%`;
+                    document.getElementById('image-y-position').value = watermarkPositions[index].top;
+                    document.getElementById('y-position-value').textContent = `${Math.round(watermarkPositions[index].top)}%`;
+                }
+            } else {
+                watermark.style.display = 'none';
+            }
+        }
+
+        function updateAllWatermarks() {
+            const watermarks = document.querySelectorAll('.watermark');
+            watermarks.forEach((_, index) => updateWatermark(index));
+        }
+
+        // Debounce function to optimize slider updates
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        document.getElementById('image-upload').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentWatermark = e.target.result;
+                    updateAllWatermarks();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('image-size').addEventListener('input', debounce((event) => {
+            watermarkSize = event.target.value;
+            document.getElementById('size-value').textContent = `${Math.round(watermarkSize)}%`;
+            updateAllWatermarks();
+        }, 100));
+
+        document.getElementById('image-opacity').addEventListener('input', debounce((event) => {
+            watermarkOpacity = event.target.value;
+            document.getElementById('opacity-value').textContent = watermarkOpacity;
+            updateAllWatermarks();
+        }, 100));
+
+        document.getElementById('image-x-position').addEventListener('input', debounce((event) => {
+            const xPosition = event.target.value;
+            document.getElementById('x-position-value').textContent = `${xPosition}%`;
+            watermarkPositions = Object.keys(watermarkPositions).reduce((acc, index) => {
+                acc[index] = { ...watermarkPositions[index], left: parseFloat(xPosition) };
+                return acc;
+            }, {});
+            updateAllWatermarks();
+        }, 100));
+
+        document.getElementById('image-y-position').addEventListener('input', debounce((event) => {
+            const yPosition = event.target.value;
+            document.getElementById('y-position-value').textContent = `${yPosition}%`;
+            watermarkPositions = Object.keys(watermarkPositions).reduce((acc, index) => {
+                acc[index] = { ...watermarkPositions[index], top: parseFloat(yPosition) };
+                return acc;
+            }, {});
+            updateAllWatermarks();
+        }, 100));
+
+        function addWatermarkInteraction(index) {
+            const watermark = document.getElementById(`watermark-${index}`);
+            let isDragging = false;
+            let startX, startY;
+            let initialLeft = 50;
+            let initialTop = 50;
+
+            if (!watermarkPositions[index]) {
+                watermarkPositions[index] = { left: initialLeft, top: initialTop };
+            }
+
+            watermark.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const rect = watermark.parentElement.getBoundingClientRect();
+                const deltaX = (e.clientX - startX) / rect.width * 100;
+                const deltaY = (e.clientY - startY) / rect.height * 100;
+                watermarkPositions[index].left += deltaX;
+                watermarkPositions[index].top += deltaY;
+                watermark.style.left = `${watermarkPositions[index].left}%`;
+                watermark.style.top = `${watermarkPositions[index].top}%`;
+                watermark.style.transform = `translate(-50%, -50%)`;
+                document.getElementById('image-x-position').value = watermarkPositions[index].left;
+                document.getElementById('x-position-value').textContent = `${Math.round(watermarkPositions[index].left)}%`;
+                document.getElementById('image-y-position').value = watermarkPositions[index].top;
+                document.getElementById('y-position-value').textContent = `${Math.round(watermarkPositions[index].top)}%`;
+                startX = e.clientX;
+                startY = e.clientY;
+                e.preventDefault();
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            watermark.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isDragging = true;
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                    e.preventDefault();
+                }
+            });
+
+            watermark.addEventListener('touchmove', (e) => {
+                if (isDragging && e.touches.length === 1) {
+                    const rect = watermark.parentElement.getBoundingClientRect();
+                    const deltaX = (e.touches[0].clientX - startX) / rect.width * 100;
+                    const deltaY = (e.touches[0].clientY - startY) / rect.height * 100;
+                    watermarkPositions[index].left += deltaX;
+                    watermarkPositions[index].top += deltaY;
+                    watermark.style.left = `${watermarkPositions[index].left}%`;
+                    watermark.style.top = `${watermarkPositions[index].top}%`;
+                    watermark.style.transform = `translate(-50%, -50%)`;
+                    document.getElementById('image-x-position').value = watermarkPositions[index].left;
+                    document.getElementById('x-position-value').textContent = `${Math.round(watermarkPositions[index].left)}%`;
+                    document.getElementById('image-y-position').value = watermarkPositions[index].top;
+                    document.getElementById('y-position-value').textContent = `${Math.round(watermarkPositions[index].top)}%`;
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                    e.preventDefault();
+                }
+            });
+
+            watermark.addEventListener('touchend', (e) => {
+                if (e.touches.length === 0) {
+                    isDragging = false;
+                }
+            });
+
+            let initialDistance = null;
+            watermark.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    initialDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+                    e.preventDefault();
+                }
+            });
+
+            watermark.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2 && initialDistance !== null) {
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    const currentDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+                    const scaleChange = currentDistance / initialDistance;
+                    watermarkSize = Math.max(20, Math.min(150, watermarkSize * scaleChange));
+                    document.getElementById('image-size').value = watermarkSize;
+                    document.getElementById('size-value').textContent = `${Math.round(watermarkSize)}%`;
+                    updateAllWatermarks();
+                    initialDistance = currentDistance;
+                    e.preventDefault();
+                }
+            });
+
+            watermark.addEventListener('touchend', (e) => {
+                if (e.touches.length < 2) {
+                    initialDistance = null;
+                }
+            });
+
+            watermark.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -5 : 5;
+                watermarkSize = Math.max(20, Math.min(150, watermarkSize + delta));
+                document.getElementById('image-size').value = watermarkSize;
+                document.getElementById('size-value').textContent = `${Math.round(watermarkSize)}%`;
+                updateAllWatermarks();
+            });
+        }
+
         document.getElementById('report-input').addEventListener('input', parseReports);
 
-        // Toggle edit mode
         function toggleEdit() {
             const subtitles = document.querySelectorAll('.subtitle');
             const cells = document.querySelectorAll('td');
@@ -258,7 +618,6 @@
             button.textContent = isEditable ? 'Toggle Edit Mode' : 'Save Changes';
         }
 
-        // Download report as image
         function downloadReport(index) {
             const errorMessage = document.getElementById('error-message');
             if (errorMessage.style.display === 'block') {
@@ -266,42 +625,101 @@
                 return;
             }
             const element = document.getElementById(`report-content-${index}`);
-            // Temporarily hide the download button
             const downloadButton = element.querySelector('.download-button');
             downloadButton.style.display = 'none';
 
-            html2canvas(element, {
-                scale: 3,
-                backgroundColor: null,
-                useCORS: true,
-                allowTaint: true,
-                logging: false,
-                width: element.offsetWidth,
-                height: element.offsetHeight,
-                windowWidth: document.documentElement.offsetWidth,
-                windowHeight: document.documentElement.offsetHeight,
-                onclone: (clonedDoc) => {
-                    const clonedElement = clonedDoc.getElementById(`report-content-${index}`);
-                    clonedElement.style.background = 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(https://i.postimg.cc/tJhNQXVw/1000013379.jpg) center/cover no-repeat';
-                    // Ensure the download button is hidden in the cloned document
-                    const clonedButton = clonedElement.querySelector('.download-button');
-                    if (clonedButton) clonedButton.style.display = 'none';
+            // Preload background and watermark images
+            const backgroundImage = new Image();
+            backgroundImage.src = 'https://i.postimg.cc/tJhNQXVw/1000013379.jpg';
+            backgroundImage.crossOrigin = 'anonymous';
+
+            let tempWatermark = null;
+            if (currentWatermark) {
+                tempWatermark = new Image();
+                tempWatermark.src = currentWatermark;
+                tempWatermark.crossOrigin = 'anonymous';
+                tempWatermark.style.display = 'none';
+                document.body.appendChild(tempWatermark);
+            }
+
+            const renderCanvas = () => {
+                html2canvas(element, {
+                    scale: 3,
+                    backgroundColor: null,
+                    useCORS: true,
+                    allowTaint: false,
+                    logging: false,
+                    width: element.offsetWidth,
+                    height: element.offsetHeight,
+                    windowWidth: document.documentElement.offsetWidth,
+                    windowHeight: document.documentElement.offsetHeight,
+                    onclone: (clonedDoc) => {
+                        const clonedElement = clonedDoc.getElementById(`report-content-${index}`);
+                        clonedElement.style.background = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://i.postimg.cc/tJhNQXVw/1000013379.jpg') center/cover no-repeat`;
+                        const clonedWatermark = clonedElement.querySelector(`#watermark-${index}`);
+                        if (currentWatermark && clonedWatermark) {
+                            clonedWatermark.src = currentWatermark;
+                            clonedWatermark.crossOrigin = 'anonymous';
+                            clonedWatermark.style.display = 'block';
+                            clonedWatermark.style.width = `${watermarkSize}%`;
+                            clonedWatermark.style.opacity = watermarkOpacity;
+                            if (watermarkPositions[index]) {
+                                clonedWatermark.style.left = `${watermarkPositions[index].left}%`;
+                                clonedWatermark.style.top = `${watermarkPositions[index].top}%`;
+                                clonedWatermark.style.transform = `translate(-50%, -50%)`;
+                            }
+                        }
+                        const clonedButton = clonedElement.querySelector('.download-button');
+                        if (clonedButton) clonedButton.style.display = 'none';
+                    }
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `weekly-premium-signal-report-${index + 1}.png`;
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    link.click();
+                    downloadButton.style.display = 'block';
+                    if (tempWatermark) {
+                        document.body.removeChild(tempWatermark);
+                    }
+                }).catch(error => {
+                    console.error('Download error:', error);
+                    alert('Failed to download the report. Please ensure all images are accessible and try again.');
+                    downloadButton.style.display = 'block';
+                    if (tempWatermark) {
+                        document.body.removeChild(tempWatermark);
+                    }
+                });
+            };
+
+            // Wait for images to load before rendering
+            let imagesLoaded = 0;
+            const totalImages = currentWatermark ? 2 : 1;
+
+            const checkImagesLoaded = () => {
+                imagesLoaded++;
+                if (imagesLoaded === totalImages) {
+                    renderCanvas();
                 }
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `weekly-premium-signal-report-${index + 1}.png`;
-                link.href = canvas.toDataURL('image/png', 1.0);
-                link.click();
-                // Restore the download button visibility
-                downloadButton.style.display = 'block';
-            }).catch(error => {
-                console.error('Download error:', error);
-                // Restore the download button visibility in case of error
-                downloadButton.style.display = 'block';
-            });
+            };
+
+            backgroundImage.onload = checkImagesLoaded;
+            backgroundImage.onerror = () => {
+                console.error('Failed to load background image');
+                alert('Background image failed to load. Using fallback rendering.');
+                renderCanvas();
+            };
+
+            if (tempWatermark) {
+                tempWatermark.onload = checkImagesLoaded;
+                tempWatermark.onerror = () => {
+                    console.error('Failed to load watermark image');
+                    renderCanvas();
+                };
+            } else {
+                checkImagesLoaded();
+            }
         }
 
-        // Initialize
         parseReports();
     </script>
 </body>
